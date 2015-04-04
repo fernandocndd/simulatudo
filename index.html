@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+	<html>
+		<head>
+			<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+			<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+			
+			<title>Simula Tudo</title>
+			
+			<script src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js" 
+					id="sap-ui-bootstrap"
+					data-sap-ui-libs="sap.m,sap.ui.layout" 
+					data-sap-ui-xx-bindingSyntax="complex"
+					data-sap-ui-theme="sap_bluecrystal"></script>
+			<!-- load the mobile lib "sap.m", the layout lib and the "sap_bluecrystal" theme -->
+			
+			
+			<script type="text/javascript">
+				
+				// create the data
+				
+				// create some dummy JSON data
+				var data = {
+					names: [
+						{codigo: "1", nome: "FATEC - SP", estado:"SP", endereco:"Av. Tiradentes, 4372", telefone:"11 3456-2345"},
+						{codigo: "2", nome: "USP", estado:"SP", endereco:"Av. Vital Brasil, 45", telefone:"11 5364-7654"},
+						{codigo: "3", nome: "UNICAMP", estado:"SP", endereco:"Rua dos Caminhões, 43", telefone:"11 4352-8765"},
+						{codigo: "4", nome: "UFABC", estado:"SP", endereco:"", telefone:"11 2354-5643"},
+						{codigo: "5", nome: "UnB	", estado:"DF", endereco:"", telefone:"4573-8767"},
+						{codigo: "6", nome: "UFSCAR", estado:"SP", endereco:"", telefone:"14 5674-8765"}
+						
+					]
+				};
+				
+				// create a Model with this data
+				var model = new sap.ui.model.json.JSONModel();
+				model.setData(data);
+				
+				
+				
+				
+				
+				
+				
+				
+				// "cells"  
+				var oName = new sap.m.Text({text: "{codigo}"});  
+				var oQty = new sap.m.Text({text: "{nome}"});  
+				var oPrice = new sap.m.Text({text: "{estado}"});  
+				// corresponding columns  
+				var oColName = new sap.m.Column({header: new sap.m.Text({text:"Código"}) });  
+				var oColDesc = new sap.m.Column({header: new sap.m.Text({text:"Nome"}) });  
+				var oColPrice = new sap.m.Column({header: new sap.m.Text({text:"Estado"}) });  
+				// row template  
+				var oRow = new sap.m.ColumnListItem({
+				  id: "first_template",
+				  type: "Navigation",
+				  visible: true,
+				  selected: true,
+				  press:function(evt){
+							var oBindingContext = evt.getSource().getBindingContext(); // evt.getSource() is the ListItem
+							pageCadastro.setBindingContext(oBindingContext);
+							app.to("pageCadastro");
+						}});  
+				oRow.addCell(oName).addCell(oQty).addCell(oPrice);
+				
+				// table  
+				var oTab = new sap.m.Table("oTab");  
+				oTab.addColumn(oColName).addColumn(oColDesc).addColumn(oColPrice);  
+				
+				oTab.bindItems("/names", oRow);  
+				oTab.setMode(sap.m.ListMode.Delete); // delete mode  
+				// create the UI
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				// create the page Menu
+				var pageMenu = new sap.m.Page("pageMenu", {
+					title: "Menu",
+					enableScrolling: false,
+					content: [oContainer]
+				});
+				
+				var oContainer = new sap.m.TileContainer({});
+                    pageMenu.addContent(oContainer);
+ 
+ 
+                    var T1 = new sap.m.StandardTile("Tile1",{icon :"/imgc.png",
+                              title:"INSTITUIÇÕES",
+                              press:onPressInstituicoes
+                    });
+                    oContainer.addTile(T1); 
+ 
+                    var T2 = new sap.m.StandardTile("Tile2",{icon :"/test_paper.png",
+                              title:"PROVAS",
+							  press:onPressProvas
+                    });
+                    oContainer.addTile(T2);
+ 
+ 
+                    function onPressInstituicoes(){
+						
+						app.to("pageInstituicoes");
+                    }
+				
+				
+					function onPressProvas(){
+						app.to("pageProvas");
+                    }
+				
+				
+				
+				
+				// create the page holding the List
+				var pageInstituicoes = new sap.m.Page("pageInstituicoes", {
+					title: "Lista de Instituições",
+					showNavButton: true,
+					navButtonPress: function(){
+						app.back();
+					},
+					content : oTab,
+					footer: new sap.m.Bar({
+						id: 'pageInstituicoes-footer',
+						contentMiddle: [new sap.m.Button({	
+						text:"Novo", 
+							type:"Emphasized",
+							press:function(evt){
+							//var oBindingContext = evt.getSource().getBindingContext(); // evt.getSource() is the ListItem
+							//pageCadastro.setBindingContext(oBindingContext); // make sure the detail page has the correct data context
+							app.to("pageCadastro");
+							sap.ui.getCore().byId("txtCodigo").setValue('');
+							sap.ui.getCore().byId("txtNome").setValue('');
+							sap.ui.getCore().byId("txtEndereco").setValue('');
+							sap.ui.getCore().byId("txtTelefone").setValue('');
+							//	sap.ui.getCore().byId("txtEstado").setValue('');
+						}} )]
+					})
+				});
+				
+				// create the detail page
+				var page2 = new sap.m.Page("page2", {
+					title: "Detalhes",
+					showNavButton: true,
+					navButtonPress: function(){
+						app.back();
+					},
+					content : [
+						new sap.ui.layout.form.SimpleForm({ 
+							title: "Detalhes de {codigo} {nome}",
+							content: [
+								new sap.m.Label({text: "Nome"}),
+								new sap.m.Text({text: "{codigo}"}),
+								new sap.m.Label({text: "Sobrenome"}),
+								new sap.m.Text({text: "{nome}"}),
+								new sap.m.Label({text: "Cidade"}),
+								new sap.m.Text({text: "{estado}"})
+							]
+						})
+					],
+					footer: new sap.m.Bar({
+						id: 'page2-footer',
+						contentMiddle: [new sap.m.Button({	
+						text:"Editar", 
+							type:"Emphasized",
+							press:function(evt){
+							var oBindingContext = evt.getSource().getBindingContext(); // evt.getSource() is the ListItem
+							pageCadastro.setBindingContext(oBindingContext); // make sure the detail page has the correct data context
+							app.to("pageCadastro");
+						}} )]
+					})
+				});
+				
+				// create the detail page
+				var pageCadastro = new sap.m.Page("pageCadastro", {
+					title: "Cadastro",
+					showNavButton: true,
+					navButtonPress: function(){
+						app.back();
+					},
+					content : [
+						new sap.ui.layout.form.SimpleForm({ 
+							title: "",
+							content: [
+								new sap.m.Label({text: "Código"}),
+								new sap.m.Input({id:"txtCodigo", value: "{codigo}", placeholder:"Preenchido automaticamente...", width:"30%", enabled:false}),
+								new sap.m.Label({text: "Nome"}),
+								new sap.m.Input({id:"txtNome", value: "{nome}", width:"80%"}),
+								new sap.m.Label({text: "Endereço"}),
+								new sap.m.Input({id:"txtEndereco", value: "{endereco}", width:"80%"}),
+								new sap.m.Label({text: "Telefone"}),
+								new sap.m.Input({id:"txtTelefone", value: "{telefone}", width:"50%"}),
+								new sap.m.Label({text: "Estado"}),
+								new sap.m.Select({	id:"txtSenha", 
+													value: "{estado}", 
+													width:"30%", 
+													placeholder:"Selecione...",													
+													  items: [ 	new sap.ui.core.Item({key:"", text:"Selecione..."}),					
+																new sap.ui.core.Item({key:"AC", text:"AC"}),
+																new sap.ui.core.Item({key:"AL", text:"AL"}),
+																new sap.ui.core.Item({key:"AP", text:"AP"}),
+																new sap.ui.core.Item({key:"AM", text:"AM"}),
+																new sap.ui.core.Item({key:"BA", text:"BA"}),
+																new sap.ui.core.Item({key:"CE", text:"CE"}),
+																new sap.ui.core.Item({key:"DF", text:"DF"}),
+																new sap.ui.core.Item({key:"ES", text:"ES"}),
+																new sap.ui.core.Item({key:"GO", text:"GO"}),
+																new sap.ui.core.Item({key:"MA", text:"MA"}),
+																new sap.ui.core.Item({key:"MT", text:"MT"}),
+																new sap.ui.core.Item({key:"MS", text:"MS"}),
+																new sap.ui.core.Item({key:"MG", text:"MG"}),
+																new sap.ui.core.Item({key:"PA", text:"PA"}),
+																new sap.ui.core.Item({key:"PB", text:"PB"}),
+																new sap.ui.core.Item({key:"PR", text:"PR"}),
+																new sap.ui.core.Item({key:"PE", text:"PE"}),
+																new sap.ui.core.Item({key:"PI", text:"PI"}),
+																new sap.ui.core.Item({key:"RJ", text:"RJ"}),
+																new sap.ui.core.Item({key:"RN", text:"RN"}),
+																new sap.ui.core.Item({key:"RS", text:"RS"}),
+																new sap.ui.core.Item({key:"RO", text:"RO"}),
+																new sap.ui.core.Item({key:"RR", text:"RR"}),
+																new sap.ui.core.Item({key:"SC", text:"SC"}),
+																new sap.ui.core.Item({key:"SP", text:"SP"}),
+																new sap.ui.core.Item({key:"SE", text:"SE"}),
+																new sap.ui.core.Item({key:"SP", text:"SP"}),
+																new sap.ui.core.Item({key:"TO", text:"TO"}),
+															 ]
+													})
+							],
+							
+						})
+					],
+					footer: new sap.m.Bar({
+							id: 'pageCadastro-footer',
+							contentMiddle: [new sap.m.Button({	
+								text:"Cancelar", 
+								type:"Emphasized",
+								press:function(evt){
+								//var oBindingContext = evt.getSource().getBindingContext(); // evt.getSource() is the ListItem
+								//pageCadastro.setBindingContext(oBindingContext); // make sure the detail page has the correct data context
+								app.back();
+							}} ),
+							new sap.m.Button({	
+								text:"Salvar", 
+								type:"Emphasized",
+								press:function(evt){
+								//var oBindingContext = evt.getSource().getBindingContext(); // evt.getSource() is the ListItem
+								//pageCadastro.setBindingContext(oBindingContext); // make sure the detail page has the correct data context
+								app.to("pageCadastro");
+							}} )]
+						})
+				});
+				
+				
+				
+				// create a mobile App holding the pages and place the App into the HTML document
+				var app = new sap.m.App("myApp",{
+					initialPage:"pageMenu",
+					pages: [pageInstituicoes, page2, pageMenu, pageCadastro]
+				}).placeAt("content");
+				
+				// set the model to the App; it will be propagated to the children
+				app.setModel(model);
+				
+			</script>
+			
+		</head>
+		<body id="content" class="sapUiBody">
+		</body>
+	</html>
